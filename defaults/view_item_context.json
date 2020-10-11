@@ -1,0 +1,37 @@
+[
+  {
+    "command": "gmVfs.createScript",
+    "when": "view == gmVfs && viewItem == folderItem",
+    "group": "create"
+  },
+  {
+    "command": "gmVfs.createObject",
+    "when": "view == gmVfs && viewItem == folderItem",
+    "group": "create"
+  },
+  {
+    "command": "gmVfs.createFolder",
+    "when": "view == gmVfs && viewItem == folderItem",
+    "group": "create"
+  },
+  {
+    "command": "gmVfs.deleteFolder",
+    "when": "view == gmVfs && viewItem == folderItem",
+    "group": "delete"
+  },
+  {
+    "command": "gmVfs.deleteResource",
+    "when": "view == gmVfs && viewItem =~ /resourceItem/",
+    "group": "delete"
+  },
+  {
+    "command": "gmVfs.renameResource",
+    "when": "view == gmVfs && viewItem =~ /resourceItem/",
+    "group": "delete"
+  },
+  {
+    "command": "gmVfs.deleteEvent",
+    "when": "view == gmVfs && viewItem == eventItem",
+    "group": "delete"
+  }
+]

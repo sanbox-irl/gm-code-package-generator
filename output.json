@@ -1,0 +1,226 @@
+{
+  "commands": [
+    {
+      "command": "gmVfs.reloadWorkspace",
+      "title": "Reload",
+      "icon": "$(refresh)"
+    },
+    {
+      "command": "gmVfs.createScript",
+      "title": "New Script",
+      "category": "Create",
+      "icon": "$(new-file)"
+    },
+    {
+      "command": "gmVfs.createObject",
+      "title": "New Object",
+      "category": "Create",
+      "icon": "$(symbol-constructor)"
+    },
+    {
+      "command": "gmVfs.createFolder",
+      "title": "New Folder",
+      "category": "Create",
+      "icon": "$(new-folder)"
+    },
+    {
+      "command": "gmVfs.deleteFolder",
+      "title": "Delete",
+      "category": "Delete"
+    },
+    {
+      "command": "gmVfs.deleteResource",
+      "title": "Delete",
+      "category": "Delete"
+    },
+    {
+      "command": "gmVfs.renameResource",
+      "title": "Rename",
+      "category": "Delete"
+    },
+    {
+      "command": "gmVfs.renameFolder",
+      "title": "Rename",
+      "category": "Delete"
+    },
+    {
+      "command": "gmVfs.deleteEvent",
+      "title": "Delete",
+      "category": "Delete"
+    },
+    {
+      "command": "gmVfs.addDestroyEvent",
+      "title": "Destroy Event",
+      "category": "Create",
+      "enablement": "view == gmVfs && viewItem =~ /canDestroyEvent/"
+    },
+    {
+      "command": "gmVfs.addCreateEvent",
+      "title": "Create Event",
+      "category": "Create",
+      "enablement": "view == gmVfs && viewItem =~ /canCreateEvent/"
+    },
+    {
+      "command": "gmVfs.addStepEvent",
+      "title": "Step Event",
+      "category": "Create",
+      "enablement": "view == gmVfs && viewItem =~ /canStepEvent/"
+    },
+    {
+      "command": "gmVfs.addBeginStepEvent",
+      "title": "Begin Step Event",
+      "category": "Create",
+      "enablement": "view == gmVfs && viewItem =~ /canBeginStepEvent/"
+    },
+    {
+      "command": "gmVfs.addEndStepEvent",
+      "title": "End Step Event",
+      "category": "Create",
+      "enablement": "view == gmVfs && viewItem =~ /canEndStepEvent/"
+    },
+    {
+      "command": "gmVfs.addCleanUpEvent",
+      "title": "CleanUp Event",
+      "category": "Create",
+      "enablement": "view == gmVfs && viewItem =~ /canCleanUpEvent/"
+    }
+  ],
+  "menus": {
+    "view/title": [
+      {
+        "command": "gmVfs.reloadWorkspace",
+        "when": "view == gmVfs",
+        "group": "navigation"
+      },
+      {
+        "command": "gmVfs.createScript",
+        "when": "view == gmVfs",
+        "group": "navigation"
+      },
+      {
+        "command": "gmVfs.createObject",
+        "when": "view == gmVfs",
+        "group": "navigation"
+      },
+      {
+        "command": "gmVfs.createFolder",
+        "when": "view == gmVfs",
+        "group": "navigation"
+      }
+    ],
+    "view/title/context": [
+      {
+        "command": "gmVfs.createScript",
+        "when": "view == gmVfs && viewItem == folderItem",
+        "group": "create"
+      },
+      {
+        "command": "gmVfs.createObject",
+        "when": "view == gmVfs && viewItem == folderItem",
+        "group": "create"
+      },
+      {
+        "command": "gmVfs.createFolder",
+        "when": "view == gmVfs && viewItem == folderItem",
+        "group": "create"
+      },
+      {
+        "command": "gmVfs.deleteFolder",
+        "when": "view == gmVfs && viewItem == folderItem",
+        "group": "delete"
+      },
+      {
+        "command": "gmVfs.deleteResource",
+        "when": "view == gmVfs && viewItem =~ /resourceItem/",
+        "group": "delete"
+      },
+      {
+        "command": "gmVfs.renameResource",
+        "when": "view == gmVfs && viewItem =~ /resourceItem/",
+        "group": "delete"
+      },
+      {
+        "command": "gmVfs.deleteEvent",
+        "when": "view == gmVfs && viewItem == eventItem",
+        "group": "delete"
+      },
+      {
+        "command": "gmVfs.addDestroyEvent",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@1"
+      },
+      {
+        "command": "gmVfs.addCreateEvent",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@0"
+      },
+      {
+        "submenu": "gmVfs.Step",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@3"
+      },
+      {
+        "command": "gmVfs.addCleanUpEvent",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@2"
+      }
+    ],
+    "gmVfs.Step": [
+      {
+        "command": "gmVfs.addStepEvent",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@0"
+      },
+      {
+        "command": "gmVfs.addBeginStepEvent",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@1"
+      },
+      {
+        "command": "gmVfs.addEndStepEvent",
+        "when": "view == gmVfs && viewItem =~ /objectItem/",
+        "group": "create@2"
+      }
+    ]
+  },
+  "submenus": [
+    {
+      "id": "gmVfs.Step",
+      "label": "Step"
+    }
+  ],
+  "taskDefinitions": [
+    {
+      "properties": {
+        "task": {
+          "description": "The adam task to run",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task"
+      ],
+      "type": "adam"
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "gmCode.overrideServerPath": {
+        "description": "Override path to the gm-code backend server. Used to develop the extension.",
+        "type": [
+          "null",
+          "string"
+        ]
+      }
+    },
+    "title": "Gm Code"
+  },
+  "views": {
+    "explorer": [
+      {
+        "id": "gmVfs",
+        "name": "Gm Code"
+      }
+    ]
+  }
+}

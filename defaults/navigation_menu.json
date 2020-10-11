@@ -1,0 +1,22 @@
+[
+  {
+    "command": "gmVfs.reloadWorkspace",
+    "when": "view == gmVfs",
+    "group": "navigation"
+  },
+  {
+    "command": "gmVfs.createScript",
+    "when": "view == gmVfs",
+    "group": "navigation"
+  },
+  {
+    "command": "gmVfs.createObject",
+    "when": "view == gmVfs",
+    "group": "navigation"
+  },
+  {
+    "command": "gmVfs.createFolder",
+    "when": "view == gmVfs",
+    "group": "navigation"
+  }
+]
