@@ -16,9 +16,13 @@ pub struct Command {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     icon: Option<String>,
+
+    #[serde(skip)]
+    pub event: EventType,
 }
 impl Command {
-    pub fn new(nice_name: &str) -> Self {
+    pub fn new(event: EventType) -> Self {
+        let nice_name = event.to_string();
         Self {
             command: format!("gmVfs.add{}Event", nice_name.to_camel_case()),
             title: format!("{} Event", nice_name),
@@ -28,6 +32,7 @@ impl Command {
                 nice_name.to_camel_case()
             )),
             icon: None,
+            event,
         }
     }
 }
@@ -41,11 +46,7 @@ pub fn create_command_lists() -> HashMap<String, Vec<Command>> {
         .iter()
         .map(|name| {
             let values = (0..200)
-                .filter_map(|i| {
-                    EventType::parse_filename(name, i)
-                        .ok()
-                        .map(|event| Command::new(&event.to_string()))
-                })
+                .filter_map(|i| EventType::parse_filename(name, i).ok().map(Command::new))
                 .collect::<Vec<_>>();
 
             (name.to_string(), values)

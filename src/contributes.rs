@@ -1,6 +1,7 @@
 use crate::{Command, CommandContext, Menus};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use yy_typings::object_yy::{EventType, OtherEvent};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -46,9 +47,72 @@ impl Contributes {
                         commands.push(c);
                     }
                 }
-                "Alarm" => {}
-                "Draw" => {}
-                "Other" => {}
+                "Alarm" => {
+                    let id = menus.add_submenu_toplevel("Alarm", 4, None);
+
+                    for (i, c) in c.into_iter().enumerate() {
+                        menus.add_context_submenu(&id, CommandContext::new(&c.command, i));
+                        commands.push(c);
+                    }
+                }
+                "Draw" => {
+                    let id = menus.add_submenu_toplevel("Drawn", 5, None);
+
+                    for (i, c) in c.into_iter().enumerate() {
+                        menus.add_context_submenu(&id, CommandContext::new(&c.command, i));
+                        commands.push(c);
+                    }
+                }
+                "Other" => {
+                    let other_id = menus.add_submenu_toplevel("Other", 5, None);
+                    let async_id = menus.add_submenu_toplevel("Asynchronous", 6, None);
+
+                    let views = menus.add_submenu_submenu(&other_id, "Views", 2, None);
+                    let user_events = menus.add_submenu_submenu(&other_id, "User Events", 11, None);
+
+                    for (i, c) in c.into_iter().enumerate() {
+                        match c.event {
+                            EventType::Other(ev) => match ev {
+                                OtherEvent::OutsideView(_) => {
+                                    menus.add_context_submenu(
+                                        &views,
+                                        CommandContext::new(&c.command, i),
+                                    );
+                                    commands.push(c);
+                                }
+                                OtherEvent::IntersectView(_) => {
+                                    menus.add_context_submenu(
+                                        &views,
+                                        CommandContext::new(&c.command, i),
+                                    );
+                                    commands.push(c);
+                                }
+                                OtherEvent::UserEvent(_) => {
+                                    menus.add_context_submenu(
+                                        &user_events,
+                                        CommandContext::new(&c.command, i),
+                                    );
+                                    commands.push(c);
+                                }
+                                _ => {
+                                    menus.add_context_submenu(
+                                        &other_id,
+                                        CommandContext::new(&c.command, i),
+                                    );
+                                    commands.push(c);
+                                }
+                            },
+                            EventType::Async(_) => {
+                                menus.add_context_submenu(
+                                    &async_id,
+                                    CommandContext::new(&c.command, i),
+                                );
+                                commands.push(c);
+                            }
+                            _ => unimplemented!(),
+                        }
+                    }
+                }
                 _ => unimplemented!(),
             }
         }
@@ -97,16 +161,3 @@ impl Contributes {
         }
     }
 }
-/*
-
-        "configuration": {
-        },
-        "views": {
-            "explorer": [
-                {
-                    "id": "gmVfs",
-                    "name": "Gm Code"
-                }
-            ]
-        },
-*/
