@@ -99,11 +99,11 @@ pub struct CommandContext {
 }
 
 impl CommandContext {
-    pub fn new(command_name: &str, idx: usize) -> Self {
+    pub fn new(command_name: &str, group: &str, idx: usize) -> Self {
         Self {
             command: command_name.to_string(),
             when: "view == gmVfs && viewItem =~ /objectItem/".to_string(),
-            group: format!("create@{}", idx),
+            group: format!("{}@{}", group, idx),
         }
     }
 }
@@ -145,7 +145,7 @@ impl std::fmt::Display for MenuKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             MenuKey::Navigation => write!(f, "view/title"),
-            MenuKey::Context => write!(f, "view/title/context"),
+            MenuKey::Context => write!(f, "view/item/context"),
             MenuKey::Other(s) => write!(f, "{}", s),
         }
     }

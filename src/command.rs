@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use yy_typings::object_yy::EventType;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub struct Command {
     pub command: String,
     title: String,
@@ -24,8 +24,8 @@ impl Command {
     pub fn new(event: EventType) -> Self {
         let nice_name = event.to_string();
         Self {
-            command: format!("gmVfs.add{}Event", nice_name.to_camel_case()),
-            title: format!("{} Event", nice_name),
+            command: format!("gmVfs.add{}", nice_name.to_camel_case()),
+            title: nice_name.clone(),
             category: Some("Create".to_string()),
             enablement: Some(format!(
                 "view == gmVfs && viewItem =~ /can{}Event/",
@@ -37,6 +37,18 @@ impl Command {
     }
 }
 
+impl PartialOrd for Command {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.event.partial_cmp(&other.event)
+    }
+}
+
+impl Ord for Command {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.event.cmp(&other.event)
+    }
+}
+
 pub fn create_command_lists() -> HashMap<String, Vec<Command>> {
     let event_names = [
         "Create", "Destroy", "CleanUp", "Step", "Alarm", "Draw", "Other",
@@ -45,9 +57,11 @@ pub fn create_command_lists() -> HashMap<String, Vec<Command>> {
     event_names
         .iter()
         .map(|name| {
-            let values = (0..200)
+            let mut values = (0..200)
                 .filter_map(|i| EventType::parse_filename(name, i).ok().map(Command::new))
                 .collect::<Vec<_>>();
+
+            values.sort();
 
             (name.to_string(), values)
         })

@@ -1,12 +1,12 @@
 use crate::{Command, CommandContext, Menus};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use yy_typings::object_yy::{EventType, OtherEvent};
+use yy_typings::object_yy::{DrawEvent, EventType, OtherEvent, Stage};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Contributes {
-    commands: Vec<Command>,
+    pub commands: Vec<Command>,
     #[serde(flatten)]
     menus: Menus,
     task_definitions: Vec<serde_json::Value>,
@@ -24,26 +24,27 @@ impl Contributes {
                 "Create" => {
                     assert_eq!(c.len(), 1);
                     let command = c.remove(0);
-                    menus.add_context_toplevel(CommandContext::new(&command.command, 0));
+                    menus.add_context_toplevel(CommandContext::new(&command.command, "create", 0));
                     commands.push(command);
                 }
                 "Destroy" => {
                     assert_eq!(c.len(), 1);
                     let command = c.remove(0);
-                    menus.add_context_toplevel(CommandContext::new(&command.command, 1));
+                    menus.add_context_toplevel(CommandContext::new(&command.command, "create", 1));
                     commands.push(command);
                 }
                 "CleanUp" => {
                     assert_eq!(c.len(), 1);
                     let command = c.remove(0);
-                    menus.add_context_toplevel(CommandContext::new(&command.command, 2));
+                    menus.add_context_toplevel(CommandContext::new(&command.command, "create", 2));
                     commands.push(command);
                 }
                 "Step" => {
                     let id = menus.add_submenu_toplevel("Step", 3, None);
 
                     for (i, c) in c.into_iter().enumerate() {
-                        menus.add_context_submenu(&id, CommandContext::new(&c.command, i));
+                        menus
+                            .add_context_submenu(&id, CommandContext::new(&c.command, "create", i));
                         commands.push(c);
                     }
                 }
@@ -51,15 +52,30 @@ impl Contributes {
                     let id = menus.add_submenu_toplevel("Alarm", 4, None);
 
                     for (i, c) in c.into_iter().enumerate() {
-                        menus.add_context_submenu(&id, CommandContext::new(&c.command, i));
+                        menus
+                            .add_context_submenu(&id, CommandContext::new(&c.command, "create", i));
                         commands.push(c);
                     }
                 }
                 "Draw" => {
-                    let id = menus.add_submenu_toplevel("Drawn", 5, None);
+                    let id = menus.add_submenu_toplevel("Draw", 5, None);
 
                     for (i, c) in c.into_iter().enumerate() {
-                        menus.add_context_submenu(&id, CommandContext::new(&c.command, i));
+                        let group = match c.event {
+                            EventType::Draw(e) => match e {
+                                DrawEvent::DrawGui(s) | DrawEvent::Draw(s) => match s {
+                                    Stage::Main => "drawmain",
+                                    Stage::Begin => "drawpost",
+                                    Stage::End => "drawpost",
+                                },
+                                DrawEvent::PreDraw => "prepost",
+                                DrawEvent::PostDraw => "prepost",
+                                DrawEvent::WindowResize => "window",
+                            },
+                            _ => unimplemented!(),
+                        };
+
+                        menus.add_context_submenu(&id, CommandContext::new(&c.command, group, i));
                         commands.push(c);
                     }
                 }
@@ -68,46 +84,51 @@ impl Contributes {
                     let async_id = menus.add_submenu_toplevel("Asynchronous", 6, None);
 
                     let views = menus.add_submenu_submenu(&other_id, "Views", 2, None);
-                    let user_events = menus.add_submenu_submenu(&other_id, "User Events", 11, None);
+                    let user_events = menus.add_submenu_submenu(&other_id, "User Events", 10, None);
 
-                    for (i, c) in c.into_iter().enumerate() {
+                    let mut main_c = 0;
+                    let mut views_c = 0;
+                    let mut user_events_c = 0;
+                    let mut async_c = 0;
+
+                    for c in c {
                         match c.event {
                             EventType::Other(ev) => match ev {
-                                OtherEvent::OutsideView(_) => {
+                                OtherEvent::OutsideView(_) | OtherEvent::IntersectView(_) => {
                                     menus.add_context_submenu(
                                         &views,
-                                        CommandContext::new(&c.command, i),
+                                        CommandContext::new(&c.command, "create", views_c),
                                     );
                                     commands.push(c);
-                                }
-                                OtherEvent::IntersectView(_) => {
-                                    menus.add_context_submenu(
-                                        &views,
-                                        CommandContext::new(&c.command, i),
-                                    );
-                                    commands.push(c);
+                                    views_c += 1;
                                 }
                                 OtherEvent::UserEvent(_) => {
                                     menus.add_context_submenu(
                                         &user_events,
-                                        CommandContext::new(&c.command, i),
+                                        CommandContext::new(&c.command, "create", user_events_c),
                                     );
                                     commands.push(c);
+                                    user_events_c += 1;
                                 }
                                 _ => {
                                     menus.add_context_submenu(
                                         &other_id,
-                                        CommandContext::new(&c.command, i),
+                                        CommandContext::new(&c.command, "create", main_c),
                                     );
                                     commands.push(c);
+                                    main_c += 1;
+                                    if main_c == 10 {
+                                        main_c += 1;
+                                    }
                                 }
                             },
                             EventType::Async(_) => {
                                 menus.add_context_submenu(
                                     &async_id,
-                                    CommandContext::new(&c.command, i),
+                                    CommandContext::new(&c.command, "create", async_c),
                                 );
                                 commands.push(c);
+                                async_c += 1;
                             }
                             _ => unimplemented!(),
                         }
