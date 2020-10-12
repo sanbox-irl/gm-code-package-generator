@@ -362,7 +362,9 @@ checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
 
 [[package]]
 name = "yy-typings"
-version = "0.3.12"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18c0150efac2b9e5ed79853b56ed7d7854f1693ed2f36c0cf0c8970c74e17b5d"
 dependencies = [
  "num-derive",
  "num-traits",
