@@ -29,7 +29,7 @@ impl Menus {
         idx: usize,
         icon: Option<String>,
     ) -> MenuKey {
-        self.add_submenu_submenu(Self::CONTEXT_KEY, submenu_name, idx, icon)
+        self.add_submenu_submenu(Self::CONTEXT_KEY, "create", submenu_name, idx, icon)
     }
 
     pub fn add_context_submenu(&mut self, submenu: &MenuKey, cc: CommandContext) {
@@ -40,7 +40,9 @@ impl Menus {
     pub fn add_submenu_submenu(
         &mut self,
         parent: &MenuKey,
+        group: &str,
         submenu_name: &str,
+
         idx: usize,
         icon: Option<String>,
     ) -> MenuKey {
@@ -54,6 +56,7 @@ impl Menus {
         let inner = self.menus.get_mut(parent).unwrap();
         inner.insert(Context::SubMenu(SubMenuContext::new(
             &submenu_name.to_camel_case(),
+            group,
             idx,
         )));
 
@@ -116,11 +119,11 @@ pub struct SubMenuContext {
 }
 
 impl SubMenuContext {
-    pub fn new(submenu_name: &str, idx: usize) -> Self {
+    pub fn new(submenu_name: &str, group: &str, idx: usize) -> Self {
         Self {
             submenu: format!("gmVfs.{}", submenu_name),
             when: "view == gmVfs && viewItem =~ /objectItem/".to_string(),
-            group: format!("create@{}", idx),
+            group: format!("{}@{}", group, idx),
         }
     }
 }

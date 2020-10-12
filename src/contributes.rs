@@ -83,8 +83,14 @@ impl Contributes {
                     let other_id = menus.add_submenu_toplevel("Other", 5, None);
                     let async_id = menus.add_submenu_toplevel("Asynchronous", 6, None);
 
-                    let views = menus.add_submenu_submenu(&other_id, "Views", 2, None);
-                    let user_events = menus.add_submenu_submenu(&other_id, "User Events", 10, None);
+                    let views = menus.add_submenu_submenu(&other_id, "create", "Views", 2, None);
+                    let user_events = menus.add_submenu_submenu(
+                        &other_id,
+                        "pathAndUser",
+                        "User Events",
+                        10,
+                        None,
+                    );
 
                     let mut main_c = 0;
                     let mut views_c = 0;
@@ -105,15 +111,32 @@ impl Contributes {
                                 OtherEvent::UserEvent(_) => {
                                     menus.add_context_submenu(
                                         &user_events,
-                                        CommandContext::new(&c.command, "create", user_events_c),
+                                        CommandContext::new(
+                                            &c.command,
+                                            "pathAndUser",
+                                            user_events_c,
+                                        ),
                                     );
                                     commands.push(c);
                                     user_events_c += 1;
                                 }
-                                _ => {
+                                other => {
+                                    let group = match other {
+                                        OtherEvent::GameStart | OtherEvent::GameEnd => "game",
+                                        OtherEvent::RoomEnd | OtherEvent::RoomStart => "jRoom",
+                                        OtherEvent::AnimationEnd
+                                        | OtherEvent::AnimationUpdate
+                                        | OtherEvent::AnimationEvent => "kanimation",
+                                        OtherEvent::PathEnded => "pathAndUser",
+                                        OtherEvent::BroadcastMessage => "zbroadcast",
+                                        OtherEvent::OutsideRoom | OtherEvent::IntersectBoundary => {
+                                            "acreate"
+                                        }
+                                        a => unimplemented!("{}", a),
+                                    };
                                     menus.add_context_submenu(
                                         &other_id,
-                                        CommandContext::new(&c.command, "create", main_c),
+                                        CommandContext::new(&c.command, group, main_c),
                                     );
                                     commands.push(c);
                                     main_c += 1;
